@@ -5,7 +5,7 @@ population equivalent).
 
 # Why it exists
 
-It is one of the outputs of a larger US EPA funded research that aims to provide accessible technical, economic and environmental data 
+This web map is one of the outputs of a larger [US EPA funded research](https://www.epa.gov/research-grants/innovative-water-technologies-lagoon-wastewater-systems-small-communities-grants) that aims to provide accessible technical, economic and environmental data 
 to promote contextual, cost-effective technology options to improve nutrient removal in wastewater lagoons serving small communities. 
 
 # Where the data came from
