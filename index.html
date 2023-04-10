@@ -1,0 +1,828 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="initial-scale=1,user-scalable=no,maximum-scale=1,width=device-width">
+        <meta name="mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <link rel="stylesheet" href="css/leaflet.css"><link rel="stylesheet" href="css/L.Control.Locate.min.css">
+        <link rel="stylesheet" href="css/qgis2web.css"><link rel="stylesheet" href="css/fontawesome-all.min.css">
+        <link rel="stylesheet" href="css/leaflet-search.css">
+        <link rel="stylesheet" href="css/filter.css">
+<link rel="stylesheet" href="css/nouislider.min.css">
+        <link rel="stylesheet" href="css/leaflet-control-geocoder.Geocoder.css">
+        <style>
+        html, body, #map {
+            width: 100%;
+            height: 100%;
+            padding: 0;
+            margin: 0;
+        }
+        </style>
+        <title></title>
+    </head>
+    <body>
+        <div id="map">
+        </div>
+        <script src="js/qgis2web_expressions.js"></script>
+        <script src="js/leaflet.js"></script><script src="js/L.Control.Locate.min.js"></script>
+        <script src="js/leaflet.rotatedMarker.js"></script>
+        <script src="js/leaflet.pattern.js"></script>
+        <script src="js/leaflet-hash.js"></script>
+        <script src="js/Autolinker.min.js"></script>
+        <script src="js/rbush.min.js"></script>
+        <script src="js/labelgun.min.js"></script>
+        <script src="js/labels.js"></script>
+        <script src="js/leaflet-control-geocoder.Geocoder.js"></script>
+        <script src="js/leaflet-search.js"></script>
+        <script src="js/tailDT.js"></script>
+<script src="js/nouislider.min.js"></script>
+<script src="js/wNumb.js"></script>
+        <script src="data/Population_1.js"></script>
+        <script src="data/WastewaterLagoons_2.js"></script>
+        <script>
+        var highlightLayer;
+        function highlightFeature(e) {
+            highlightLayer = e.target;
+
+            if (e.target.feature.geometry.type === 'LineString') {
+              highlightLayer.setStyle({
+                color: '#ffff00',
+              });
+            } else {
+              highlightLayer.setStyle({
+                fillColor: '#ffff00',
+                fillOpacity: 1
+              });
+            }
+        }
+        var map = L.map('map', {
+            zoomControl:true, maxZoom:28, minZoom:1
+        }).fitBounds([[4.652273039879161,-132.57526258783122],[55.382927121628306,-37.610283515367314]]);
+        var hash = new L.Hash(map);
+        map.attributionControl.setPrefix('<a href="https://github.com/tomchadwin/qgis2web" target="_blank">qgis2web</a> &middot; <a href="https://leafletjs.com" title="A JS library for interactive maps">Leaflet</a> &middot; <a href="https://qgis.org">QGIS</a>');
+        var autolinker = new Autolinker({truncate: {length: 30, location: 'smart'}});
+        L.control.locate({locateOptions: {maxZoom: 19}}).addTo(map);
+        var bounds_group = new L.featureGroup([]);
+        function setBounds() {
+        }
+        map.createPane('pane_Basemap_0');
+        map.getPane('pane_Basemap_0').style.zIndex = 400;
+        var layer_Basemap_0 = L.tileLayer('https://a.basemaps.cartocdn.com/light_all/{z}/{x}/{y}@2x.png', {
+            pane: 'pane_Basemap_0',
+            opacity: 1.0,
+            attribution: '<a href="https://cartodb.com/basemaps/">Map tiles by CartoDB, under CC BY 3.0. Data by OpenStreetMap, under ODbL.</a>',
+            minZoom: 1,
+            maxZoom: 28,
+            minNativeZoom: 0,
+            maxNativeZoom: 20
+        });
+        layer_Basemap_0;
+        map.addLayer(layer_Basemap_0);
+        function pop_Population_1(feature, layer) {
+            layer.on({
+                mouseout: function(e) {
+                    for (i in e.target._eventParents) {
+                        e.target._eventParents[i].resetStyle(e.target);
+                    }
+                },
+                mouseover: highlightFeature,
+            });
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">Census Place</th>\
+                        <td>' + (feature.properties['CENSUS_PLACE'] !== null ? autolinker.link(feature.properties['CENSUS_PLACE'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Population</th>\
+                        <td>' + (feature.properties['POPULATION'] !== null ? autolinker.link(feature.properties['POPULATION'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Households Served</th>\
+                        <td>' + (feature.properties['HOUSEHOLDS'] !== null ? autolinker.link(feature.properties['HOUSEHOLDS'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Minorities [%]</th>\
+                        <td>' + (feature.properties['PERCENT_MINORITY'] !== null ? autolinker.link(feature.properties['PERCENT_MINORITY'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Population Density</th>\
+                        <td>' + (feature.properties['POPULATION_DENSITY'] !== null ? autolinker.link(feature.properties['POPULATION_DENSITY'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            layer.bindPopup(popupContent, {maxHeight: 400});
+        }
+
+        function style_Population_1_0(feature) {
+            if (feature.properties['POPULATION'] >= 0.000000 && feature.properties['POPULATION'] <= 715.000000 ) {
+                return {
+                pane: 'pane_Population_1',
+                radius: 4.0,
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(53,91,132,1.0)',
+                interactive: true,
+            }
+            }
+            if (feature.properties['POPULATION'] >= 715.000000 && feature.properties['POPULATION'] <= 1913.000000 ) {
+                return {
+                pane: 'pane_Population_1',
+                radius: 6.0,
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(53,91,132,1.0)',
+                interactive: true,
+            }
+            }
+            if (feature.properties['POPULATION'] >= 1913.000000 && feature.properties['POPULATION'] <= 3983.000000 ) {
+                return {
+                pane: 'pane_Population_1',
+                radius: 8.0,
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(53,91,132,1.0)',
+                interactive: true,
+            }
+            }
+            if (feature.properties['POPULATION'] >= 3983.000000 && feature.properties['POPULATION'] <= 7192.000000 ) {
+                return {
+                pane: 'pane_Population_1',
+                radius: 10.0,
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(53,91,132,1.0)',
+                interactive: true,
+            }
+            }
+            if (feature.properties['POPULATION'] >= 7192.000000 && feature.properties['POPULATION'] <= 10978.000000 ) {
+                return {
+                pane: 'pane_Population_1',
+                radius: 12.0,
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(53,91,132,1.0)',
+                interactive: true,
+            }
+            }
+        }
+        map.createPane('pane_Population_1');
+        map.getPane('pane_Population_1').style.zIndex = 401;
+        map.getPane('pane_Population_1').style['mix-blend-mode'] = 'normal';
+        var layer_Population_1 = new L.geoJson(json_Population_1, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_Population_1',
+            layerName: 'layer_Population_1',
+            pane: 'pane_Population_1',
+            onEachFeature: pop_Population_1,
+            pointToLayer: function (feature, latlng) {
+                var context = {
+                    feature: feature,
+                    variables: {}
+                };
+                return L.circleMarker(latlng, style_Population_1_0(feature));
+            },
+        });
+        bounds_group.addLayer(layer_Population_1);
+        function pop_WastewaterLagoons_2(feature, layer) {
+            layer.on({
+                mouseout: function(e) {
+                    for (i in e.target._eventParents) {
+                        e.target._eventParents[i].resetStyle(e.target);
+                    }
+                },
+                mouseover: highlightFeature,
+            });
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">NPDES ID</th>\
+                        <td>' + (feature.properties['NPDES_ID'] !== null ? autolinker.link(feature.properties['NPDES_ID'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Lagoon Type</th>\
+                        <td>' + (feature.properties['LAGOON_TYPE'] !== null ? autolinker.link(feature.properties['LAGOON_TYPE'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Facility Name</th>\
+                        <td>' + (feature.properties['FACILITY_NAME'] !== null ? autolinker.link(feature.properties['FACILITY_NAME'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Facility Address 1</th>\
+                        <td>' + (feature.properties['FACILITY_ADDRESS_1'] !== null ? autolinker.link(feature.properties['FACILITY_ADDRESS_1'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Facility Address 2</th>\
+                        <td>' + (feature.properties['FACILITY_ADDRESS_2'] !== null ? autolinker.link(feature.properties['FACILITY_ADDRESS_2'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">County</th>\
+                        <td>' + (feature.properties['COUNTY'] !== null ? autolinker.link(feature.properties['COUNTY'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">City</th>\
+                        <td>' + (feature.properties['CITY'] !== null ? autolinker.link(feature.properties['CITY'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">State</th>\
+                        <td>' + (feature.properties['STATE'] !== null ? autolinker.link(feature.properties['STATE'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Zip Code</th>\
+                        <td>' + (feature.properties['ZIP'] !== null ? autolinker.link(feature.properties['ZIP'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Facility Description</th>\
+                        <td>' + (feature.properties['FACILITY_DESCRIPTION'] !== null ? autolinker.link(feature.properties['FACILITY_DESCRIPTION'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Flow [MGD]</th>\
+                        <td>' + (feature.properties['FLOW_MGD'] !== null ? autolinker.link(feature.properties['FLOW_MGD'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Lagoon Design</th>\
+                        <td>' + (feature.properties['LAGOON_DESIGN'] !== null ? autolinker.link(feature.properties['LAGOON_DESIGN'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">No. of Cells</th>\
+                        <td>' + (feature.properties['CELLS'] !== null ? autolinker.link(feature.properties['CELLS'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Pre-treatment</th>\
+                        <td>' + (feature.properties['PRE-TREATMENT'] !== null ? autolinker.link(feature.properties['PRE-TREATMENT'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Pond Configuration</th>\
+                        <td>' + (feature.properties['POND_CONFIGURATION'] !== null ? autolinker.link(feature.properties['POND_CONFIGURATION'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Ancillaries</th>\
+                        <td>' + (feature.properties['ANCILLARIES'] !== null ? autolinker.link(feature.properties['ANCILLARIES'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Treatment Stages</th>\
+                        <td>' + (feature.properties['TREATMENT_STAGES'] !== null ? autolinker.link(feature.properties['TREATMENT_STAGES'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Unit Processes</th>\
+                        <td>' + (feature.properties['UNIT_PROCESS'] !== null ? autolinker.link(feature.properties['UNIT_PROCESS'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Lagoon Modifications</th>\
+                        <td>' + (feature.properties['LAGOON_MODIFICATIONS'] !== null ? autolinker.link(feature.properties['LAGOON_MODIFICATIONS'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Add-on Technologies</th>\
+                        <td>' + (feature.properties['ADD_ON_TECH'] !== null ? autolinker.link(feature.properties['ADD_ON_TECH'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Existing Nutrient Removal </th>\
+                        <td>' + (feature.properties['NUTRIENT_REMOVAL'] !== null ? autolinker.link(feature.properties['NUTRIENT_REMOVAL'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Post-treatment</th>\
+                        <td>' + (feature.properties['POST_TREATMENT'] !== null ? autolinker.link(feature.properties['POST_TREATMENT'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Disinfection</th>\
+                        <td>' + (feature.properties['DISINFECTION'] !== null ? autolinker.link(feature.properties['DISINFECTION'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Effluent Management</th>\
+                        <td>' + (feature.properties['EFFLUENT_MANAGEMENT'] !== null ? autolinker.link(feature.properties['EFFLUENT_MANAGEMENT'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Sludge Management</th>\
+                        <td>' + (feature.properties['SLUDGE_MANAGEMENT'] !== null ? autolinker.link(feature.properties['SLUDGE_MANAGEMENT'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Exceeded Pollutants</th>\
+                        <td>' + (feature.properties['EFFLUENT_EXCEED_POLLUTANTS'] !== null ? autolinker.link(feature.properties['EFFLUENT_EXCEED_POLLUTANTS'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Exceeded Nutrients</th>\
+                        <td>' + (feature.properties['NUTRIENT_EXCEEDANCE_FLAG'] !== null ? autolinker.link(feature.properties['NUTRIENT_EXCEEDANCE_FLAG'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Receiving Water Impaired?</th>\
+                        <td>' + (feature.properties['IMPAIRED_WATER'] !== null ? autolinker.link(feature.properties['IMPAIRED_WATER'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Cause of Impairment?</th>\
+                        <td>' + (feature.properties['IMPAIRED_CAUSE'] !== null ? autolinker.link(feature.properties['IMPAIRED_CAUSE'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Possible Impairment Contributors</th>\
+                        <td>' + (feature.properties['IMPAIRED_POSSIBLE_CONTRIBUTORS'] !== null ? autolinker.link(feature.properties['IMPAIRED_POSSIBLE_CONTRIBUTORS'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Census Place</th>\
+                        <td>' + (feature.properties['CENSUS_PLACE'] !== null ? autolinker.link(feature.properties['CENSUS_PLACE'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Population</th>\
+                        <td>' + (feature.properties['POPULATION'] !== null ? autolinker.link(feature.properties['POPULATION'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Households Served</th>\
+                        <td>' + (feature.properties['HOUSEHOLDS'] !== null ? autolinker.link(feature.properties['HOUSEHOLDS'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Minorities [%]</th>\
+                        <td>' + (feature.properties['PERCENT_MINORITY'] !== null ? autolinker.link(feature.properties['PERCENT_MINORITY'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Population Density</th>\
+                        <td>' + (feature.properties['POPULATION_DENSITY'] !== null ? autolinker.link(feature.properties['POPULATION_DENSITY'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            layer.bindPopup(popupContent, {maxHeight: 400});
+        }
+
+        function style_WastewaterLagoons_2_0(feature) {
+            switch(String(feature.properties['LAGOON_TYPE'])) {
+                case 'AERATED':
+                    return {
+                pane: 'pane_WastewaterLagoons_2',
+                radius: 4.0,
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(43,131,186,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'ANAEROBIC':
+                    return {
+                pane: 'pane_WastewaterLagoons_2',
+                radius: 4.0,
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(199,232,173,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'FACULTATIVE':
+                    return {
+                pane: 'pane_WastewaterLagoons_2',
+                radius: 4.0,
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(254,201,128,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'NA':
+                    return {
+                pane: 'pane_WastewaterLagoons_2',
+                radius: 4.0,
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(215,25,28,1.0)',
+                interactive: true,
+            }
+                    break;
+            }
+        }
+        map.createPane('pane_WastewaterLagoons_2');
+        map.getPane('pane_WastewaterLagoons_2').style.zIndex = 402;
+        map.getPane('pane_WastewaterLagoons_2').style['mix-blend-mode'] = 'normal';
+        var layer_WastewaterLagoons_2 = new L.geoJson(json_WastewaterLagoons_2, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_WastewaterLagoons_2',
+            layerName: 'layer_WastewaterLagoons_2',
+            pane: 'pane_WastewaterLagoons_2',
+            onEachFeature: pop_WastewaterLagoons_2,
+            pointToLayer: function (feature, latlng) {
+                var context = {
+                    feature: feature,
+                    variables: {}
+                };
+                return L.circleMarker(latlng, style_WastewaterLagoons_2_0(feature));
+            },
+        });
+        bounds_group.addLayer(layer_WastewaterLagoons_2);
+        map.addLayer(layer_WastewaterLagoons_2);
+            var abstract = new L.Control({'position':'bottomleft'});
+            abstract.onAdd = function (map) {
+                this._div = L.DomUtil.create('div',
+                'leaflet-control abstract');
+                this._div.id = 'abstract'
+                    this._div.setAttribute("onmouseenter", "abstract.show()");
+                    this._div.setAttribute("onmouseleave", "abstract.hide()");
+                    this.hide();
+                    return this._div;
+                };
+                abstract.hide = function () {
+                    this._div.classList.remove("abstractUncollapsed");
+                    this._div.classList.add("abstract");
+                    this._div.innerHTML = 'i'
+                }
+                abstract.show = function () {
+                    this._div.classList.remove("abstract");
+                    this._div.classList.add("abstractUncollapsed");
+                    this._div.innerHTML = 'This is web map showing the spatial distribution of lagoon wastewater treatment facilities serving small communities (less than 10,000 population equivalent. It is one of the outputs of a larger US EPA funded research that aims to provide accessible technical, economic and environmental data to promote contextual, cost-effective technology options to improve nutrient removal in wastewater lagoons serving small communities. The data sources used to prepare this web map include: U.S EPA\'s Lagoon Inventory 2022, the Enforcement and Compliance History Online (ECHO) database,  the Integrated Compliance Information System National Pollutant Discharge Elimination System (ICIS-NPDES) databases and the Clean Watershed Needs Survey 2000 - 2012 datasets. <br /><br />Author: Denis Sigei Ruto<br />Last updated: 2023-04-10';
+            };
+            abstract.addTo(map);
+        var osmGeocoder = new L.Control.Geocoder({
+            collapsed: true,
+            position: 'topleft',
+            text: 'Search',
+            title: 'Testing'
+        }).addTo(map);
+        document.getElementsByClassName('leaflet-control-geocoder-icon')[0]
+        .className += ' fa fa-search';
+        document.getElementsByClassName('leaflet-control-geocoder-icon')[0]
+        .title += 'Search for a place';
+        var baseMaps = {};
+        L.control.layers(baseMaps,{'Wastewater Lagoons<br /><table><tr><td style="text-align: center;"><img src="legend/WastewaterLagoons_2_AeratedLagoons0.png" /></td><td>Aerated Lagoons</td></tr><tr><td style="text-align: center;"><img src="legend/WastewaterLagoons_2_AnaerobicLagoons1.png" /></td><td>Anaerobic Lagoons</td></tr><tr><td style="text-align: center;"><img src="legend/WastewaterLagoons_2_FacultativeLagoons2.png" /></td><td>Facultative Lagoons</td></tr><tr><td style="text-align: center;"><img src="legend/WastewaterLagoons_2_Unspecified3.png" /></td><td>Unspecified</td></tr></table>': layer_WastewaterLagoons_2,'Population<br /><table><tr><td style="text-align: center;"><img src="legend/Population_1_07150.png" /></td><td>0 - 715</td></tr><tr><td style="text-align: center;"><img src="legend/Population_1_71519131.png" /></td><td>715 - 1,913</td></tr><tr><td style="text-align: center;"><img src="legend/Population_1_191339832.png" /></td><td>1,913 - 3,983</td></tr><tr><td style="text-align: center;"><img src="legend/Population_1_398371923.png" /></td><td>3,983 - 7,192</td></tr><tr><td style="text-align: center;"><img src="legend/Population_1_71924.png" /></td><td> > 7,192</td></tr></table>': layer_Population_1,"Basemap": layer_Basemap_0,}).addTo(map);
+        setBounds();
+        map.addControl(new L.Control.Search({
+            layer: layer_WastewaterLagoons_2,
+            initial: false,
+            hideMarkerOnCollapse: true,
+            propertyName: 'NPDES_ID'}));
+        document.getElementsByClassName('search-button')[0].className +=
+         ' fa fa-binoculars';
+        var mapDiv = document.getElementById('map');
+        var row = document.createElement('div');
+        row.className="row";
+        row.id="all";
+        row.style.height = "100%";
+        var col1 = document.createElement('div');
+        col1.className="col9";
+        col1.id = "mapWindow";
+        col1.style.height = "99%";
+        col1.style.width = "80%";
+        col1.style.display = "inline-block";
+        var col2 = document.createElement('div');
+        col2.className="col3";
+        col2.id = "menu";
+        col2.style.display = "inline-block";
+        mapDiv.parentNode.insertBefore(row, mapDiv);
+        document.getElementById("all").appendChild(col1);
+        document.getElementById("all").appendChild(col2);
+        col1.appendChild(mapDiv)
+        var Filters = {"LAGOON_TYPE": "str","STATE": "str","NUTRIENT_REMOVAL": "str","LAGOON_MODIFICATIONS": "str","ADD_ON_TECH": "str"};
+        function filterFunc() {
+          map.eachLayer(function(lyr){
+          if ("options" in lyr && "dataVar" in lyr["options"]){
+            features = this[lyr["options"]["dataVar"]].features.slice(0);
+            try{
+              for (key in Filters){
+                keyS = key.replace(/[^a-zA-Z0-9_]/g, "")
+                if (Filters[key] == "str" || Filters[key] == "bool"){
+                  var selection = [];
+                  var options = document.getElementById("sel_" + keyS).options
+                  for (var i=0; i < options.length; i++) {
+                    if (options[i].selected) selection.push(options[i].value);
+                  }
+                    try{
+                      if (key in features[0].properties){
+                        for (i = features.length - 1;
+                          i >= 0; --i){
+                          if (selection.indexOf(
+                          features[i].properties[key])<0
+                          && selection.length>0) {
+                          features.splice(i,1);
+                          }
+                        }
+                      }
+                    } catch(err){
+                  }
+                }
+                if (Filters[key] == "int"){
+                  sliderVals =  document.getElementById(
+                    "div_" + keyS).noUiSlider.get();
+                  try{
+                    if (key in features[0].properties){
+                    for (i = features.length - 1; i >= 0; --i){
+                      if (parseInt(features[i].properties[key])
+                          < sliderVals[0]
+                          || parseInt(features[i].properties[key])
+                          > sliderVals[1]){
+                            features.splice(i,1);
+                          }
+                        }
+                      }
+                    } catch(err){
+                    }
+                  }
+                if (Filters[key] == "real"){
+                  sliderVals =  document.getElementById(
+                    "div_" + keyS).noUiSlider.get();
+                  try{
+                    if (key in features[0].properties){
+                    for (i = features.length - 1; i >= 0; --i){
+                      if (features[i].properties[key]
+                          < sliderVals[0]
+                          || features[i].properties[key]
+                          > sliderVals[1]){
+                            features.splice(i,1);
+                          }
+                        }
+                      }
+                    } catch(err){
+                    }
+                  }
+                if (Filters[key] == "date"
+                  || Filters[key] == "datetime"
+                  || Filters[key] == "time"){
+                  try{
+                    if (key in features[0].properties){
+                      HTMLkey = key.replace(/[&\/\\#,+()$~%.'":*?<>{} ]/g, '');
+                      startdate = document.getElementById("dat_" +
+                        HTMLkey + "_date1").value.replace(" ", "T");
+                      enddate = document.getElementById("dat_" +
+                        HTMLkey + "_date2").value.replace(" ", "T");
+                      for (i = features.length - 1; i >= 0; --i){
+                        if (features[i].properties[key] < startdate
+                          || features[i].properties[key] > enddate){
+                          features.splice(i,1);
+                        }
+                      }
+                    }
+                  } catch(err){
+                  }
+                }
+              }
+            } catch(err){
+            }
+          this[lyr["options"]["layerName"]].clearLayers();
+          this[lyr["options"]["layerName"]].addData(features);
+          }
+          })
+        }
+            document.getElementById("menu").appendChild(
+                document.createElement("div"));
+            var div_LAGOON_TYPE = document.createElement('div');
+            div_LAGOON_TYPE.id = "div_LAGOON_TYPE";
+            div_LAGOON_TYPE.className= "filterselect";
+            document.getElementById("menu").appendChild(div_LAGOON_TYPE);
+            sel_LAGOON_TYPE = document.createElement('select');
+            sel_LAGOON_TYPE.multiple = true;
+            sel_LAGOON_TYPE.size = 4;
+            sel_LAGOON_TYPE.id = "sel_LAGOON_TYPE";
+            var LAGOON_TYPE_options_str = "<option value='' unselected></option>";
+            sel_LAGOON_TYPE.onchange = function(){filterFunc()};
+            LAGOON_TYPE_options_str  += '<option value="AERATED">AERATED</option>';
+            LAGOON_TYPE_options_str  += '<option value="ANAEROBIC">ANAEROBIC</option>';
+            LAGOON_TYPE_options_str  += '<option value="FACULTATIVE">FACULTATIVE</option>';
+            LAGOON_TYPE_options_str  += '<option value="NA">NA</option>';
+            sel_LAGOON_TYPE.innerHTML = LAGOON_TYPE_options_str;
+            div_LAGOON_TYPE.appendChild(sel_LAGOON_TYPE);
+            var lab_LAGOON_TYPE = document.createElement('div');
+            lab_LAGOON_TYPE.innerHTML = 'LAGOON_TYPE';
+            lab_LAGOON_TYPE.className = 'filterlabel';
+            div_LAGOON_TYPE.appendChild(lab_LAGOON_TYPE);
+            var reset_LAGOON_TYPE = document.createElement('div');
+            reset_LAGOON_TYPE.innerHTML = 'clear filter';
+            reset_LAGOON_TYPE.className = 'filterlabel';
+            reset_LAGOON_TYPE.onclick = function() {
+                var options = document.getElementById("sel_LAGOON_TYPE").options;
+                for (var i=0; i < options.length; i++) {
+                    options[i].selected = false;
+                }
+                filterFunc();
+            };
+            div_LAGOON_TYPE.appendChild(reset_LAGOON_TYPE);
+            document.getElementById("menu").appendChild(
+                document.createElement("div"));
+            var div_STATE = document.createElement('div');
+            div_STATE.id = "div_STATE";
+            div_STATE.className= "filterselect";
+            document.getElementById("menu").appendChild(div_STATE);
+            sel_STATE = document.createElement('select');
+            sel_STATE.multiple = true;
+            sel_STATE.size = 10;
+            sel_STATE.id = "sel_STATE";
+            var STATE_options_str = "<option value='' unselected></option>";
+            sel_STATE.onchange = function(){filterFunc()};
+            STATE_options_str  += '<option value="AK">AK</option>';
+            STATE_options_str  += '<option value="AL">AL</option>';
+            STATE_options_str  += '<option value="AR">AR</option>';
+            STATE_options_str  += '<option value="AZ">AZ</option>';
+            STATE_options_str  += '<option value="CA">CA</option>';
+            STATE_options_str  += '<option value="CO">CO</option>';
+            STATE_options_str  += '<option value="CT">CT</option>';
+            STATE_options_str  += '<option value="FL">FL</option>';
+            STATE_options_str  += '<option value="GA">GA</option>';
+            STATE_options_str  += '<option value="IA">IA</option>';
+            STATE_options_str  += '<option value="ID">ID</option>';
+            STATE_options_str  += '<option value="IL">IL</option>';
+            STATE_options_str  += '<option value="IN">IN</option>';
+            STATE_options_str  += '<option value="KS">KS</option>';
+            STATE_options_str  += '<option value="KY">KY</option>';
+            STATE_options_str  += '<option value="LA">LA</option>';
+            STATE_options_str  += '<option value="MD">MD</option>';
+            STATE_options_str  += '<option value="ME">ME</option>';
+            STATE_options_str  += '<option value="MI">MI</option>';
+            STATE_options_str  += '<option value="MN">MN</option>';
+            STATE_options_str  += '<option value="MO">MO</option>';
+            STATE_options_str  += '<option value="MS">MS</option>';
+            STATE_options_str  += '<option value="MT">MT</option>';
+            STATE_options_str  += '<option value="NC">NC</option>';
+            STATE_options_str  += '<option value="ND">ND</option>';
+            STATE_options_str  += '<option value="NE">NE</option>';
+            STATE_options_str  += '<option value="NH">NH</option>';
+            STATE_options_str  += '<option value="NM">NM</option>';
+            STATE_options_str  += '<option value="NV">NV</option>';
+            STATE_options_str  += '<option value="NY">NY</option>';
+            STATE_options_str  += '<option value="OH">OH</option>';
+            STATE_options_str  += '<option value="OK">OK</option>';
+            STATE_options_str  += '<option value="OR">OR</option>';
+            STATE_options_str  += '<option value="PA">PA</option>';
+            STATE_options_str  += '<option value="RI">RI</option>';
+            STATE_options_str  += '<option value="SC">SC</option>';
+            STATE_options_str  += '<option value="SD">SD</option>';
+            STATE_options_str  += '<option value="TN">TN</option>';
+            STATE_options_str  += '<option value="TX">TX</option>';
+            STATE_options_str  += '<option value="UT">UT</option>';
+            STATE_options_str  += '<option value="VA">VA</option>';
+            STATE_options_str  += '<option value="VT">VT</option>';
+            STATE_options_str  += '<option value="WA">WA</option>';
+            STATE_options_str  += '<option value="WI">WI</option>';
+            STATE_options_str  += '<option value="WV">WV</option>';
+            STATE_options_str  += '<option value="WY">WY</option>';
+            sel_STATE.innerHTML = STATE_options_str;
+            div_STATE.appendChild(sel_STATE);
+            var lab_STATE = document.createElement('div');
+            lab_STATE.innerHTML = 'STATE';
+            lab_STATE.className = 'filterlabel';
+            div_STATE.appendChild(lab_STATE);
+            var reset_STATE = document.createElement('div');
+            reset_STATE.innerHTML = 'clear filter';
+            reset_STATE.className = 'filterlabel';
+            reset_STATE.onclick = function() {
+                var options = document.getElementById("sel_STATE").options;
+                for (var i=0; i < options.length; i++) {
+                    options[i].selected = false;
+                }
+                filterFunc();
+            };
+            div_STATE.appendChild(reset_STATE);
+            document.getElementById("menu").appendChild(
+                document.createElement("div"));
+            var div_NUTRIENT_REMOVAL = document.createElement('div');
+            div_NUTRIENT_REMOVAL.id = "div_NUTRIENT_REMOVAL";
+            div_NUTRIENT_REMOVAL.className= "filterselect";
+            document.getElementById("menu").appendChild(div_NUTRIENT_REMOVAL);
+            sel_NUTRIENT_REMOVAL = document.createElement('select');
+            sel_NUTRIENT_REMOVAL.multiple = true;
+            sel_NUTRIENT_REMOVAL.size = 4;
+            sel_NUTRIENT_REMOVAL.id = "sel_NUTRIENT_REMOVAL";
+            var NUTRIENT_REMOVAL_options_str = "<option value='' unselected></option>";
+            sel_NUTRIENT_REMOVAL.onchange = function(){filterFunc()};
+            NUTRIENT_REMOVAL_options_str  += '<option value="AMMONIA">AMMONIA</option>';
+            NUTRIENT_REMOVAL_options_str  += '<option value="NA">NA</option>';
+            NUTRIENT_REMOVAL_options_str  += '<option value="TOTAL_NITROGEN">TOTAL_NITROGEN</option>';
+            NUTRIENT_REMOVAL_options_str  += '<option value="TOTAL_PHOSPHORUS">TOTAL_PHOSPHORUS</option>';
+            sel_NUTRIENT_REMOVAL.innerHTML = NUTRIENT_REMOVAL_options_str;
+            div_NUTRIENT_REMOVAL.appendChild(sel_NUTRIENT_REMOVAL);
+            var lab_NUTRIENT_REMOVAL = document.createElement('div');
+            lab_NUTRIENT_REMOVAL.innerHTML = 'NUTRIENT_REMOVAL';
+            lab_NUTRIENT_REMOVAL.className = 'filterlabel';
+            div_NUTRIENT_REMOVAL.appendChild(lab_NUTRIENT_REMOVAL);
+            var reset_NUTRIENT_REMOVAL = document.createElement('div');
+            reset_NUTRIENT_REMOVAL.innerHTML = 'clear filter';
+            reset_NUTRIENT_REMOVAL.className = 'filterlabel';
+            reset_NUTRIENT_REMOVAL.onclick = function() {
+                var options = document.getElementById("sel_NUTRIENT_REMOVAL").options;
+                for (var i=0; i < options.length; i++) {
+                    options[i].selected = false;
+                }
+                filterFunc();
+            };
+            div_NUTRIENT_REMOVAL.appendChild(reset_NUTRIENT_REMOVAL);
+            document.getElementById("menu").appendChild(
+                document.createElement("div"));
+            var div_LAGOON_MODIFICATIONS = document.createElement('div');
+            div_LAGOON_MODIFICATIONS.id = "div_LAGOON_MODIFICATIONS";
+            div_LAGOON_MODIFICATIONS.className= "filterselect";
+            document.getElementById("menu").appendChild(div_LAGOON_MODIFICATIONS);
+            sel_LAGOON_MODIFICATIONS = document.createElement('select');
+            sel_LAGOON_MODIFICATIONS.multiple = true;
+            sel_LAGOON_MODIFICATIONS.size = 9;
+            sel_LAGOON_MODIFICATIONS.id = "sel_LAGOON_MODIFICATIONS";
+            var LAGOON_MODIFICATIONS_options_str = "<option value='' unselected></option>";
+            sel_LAGOON_MODIFICATIONS.onchange = function(){filterFunc()};
+            LAGOON_MODIFICATIONS_options_str  += '<option value="COMPLETE_RETENTION">COMPLETE_RETENTION</option>';
+            LAGOON_MODIFICATIONS_options_str  += '<option value="CONTROLLED_DISCHARGE">CONTROLLED_DISCHARGE</option>';
+            LAGOON_MODIFICATIONS_options_str  += '<option value="FLOATING_PLANTS_WATER_HYACINTH">FLOATING_PLANTS_WATER_HYACINTH</option>';
+            LAGOON_MODIFICATIONS_options_str  += '<option value="HYDROGRAPH_CONTROL_RELEASE">HYDROGRAPH_CONTROL_RELEASE</option>';
+            LAGOON_MODIFICATIONS_options_str  += '<option value="LAND_APPLICATION_OVERLAND_FLOW">LAND_APPLICATION_OVERLAND_FLOW</option>';
+            LAGOON_MODIFICATIONS_options_str  += '<option value="LAND_APPLICATION_SLOW_RATE">LAND_APPLICATION_SLOW_RATE</option>';
+            LAGOON_MODIFICATIONS_options_str  += '<option value="NA">NA</option>';
+            LAGOON_MODIFICATIONS_options_str  += '<option value="ROCK_FILTER">ROCK_FILTER</option>';
+            LAGOON_MODIFICATIONS_options_str  += '<option value="ROCK_FILTER;COMPLETE_RETENTION">ROCK_FILTER;COMPLETE_RETENTION</option>';
+            sel_LAGOON_MODIFICATIONS.innerHTML = LAGOON_MODIFICATIONS_options_str;
+            div_LAGOON_MODIFICATIONS.appendChild(sel_LAGOON_MODIFICATIONS);
+            var lab_LAGOON_MODIFICATIONS = document.createElement('div');
+            lab_LAGOON_MODIFICATIONS.innerHTML = 'LAGOON_MODIFICATIONS';
+            lab_LAGOON_MODIFICATIONS.className = 'filterlabel';
+            div_LAGOON_MODIFICATIONS.appendChild(lab_LAGOON_MODIFICATIONS);
+            var reset_LAGOON_MODIFICATIONS = document.createElement('div');
+            reset_LAGOON_MODIFICATIONS.innerHTML = 'clear filter';
+            reset_LAGOON_MODIFICATIONS.className = 'filterlabel';
+            reset_LAGOON_MODIFICATIONS.onclick = function() {
+                var options = document.getElementById("sel_LAGOON_MODIFICATIONS").options;
+                for (var i=0; i < options.length; i++) {
+                    options[i].selected = false;
+                }
+                filterFunc();
+            };
+            div_LAGOON_MODIFICATIONS.appendChild(reset_LAGOON_MODIFICATIONS);
+            document.getElementById("menu").appendChild(
+                document.createElement("div"));
+            var div_ADD_ON_TECH = document.createElement('div');
+            div_ADD_ON_TECH.id = "div_ADD_ON_TECH";
+            div_ADD_ON_TECH.className= "filterselect";
+            document.getElementById("menu").appendChild(div_ADD_ON_TECH);
+            sel_ADD_ON_TECH = document.createElement('select');
+            sel_ADD_ON_TECH.multiple = true;
+            sel_ADD_ON_TECH.size = 8;
+            sel_ADD_ON_TECH.id = "sel_ADD_ON_TECH";
+            var ADD_ON_TECH_options_str = "<option value='' unselected></option>";
+            sel_ADD_ON_TECH.onchange = function(){filterFunc()};
+            ADD_ON_TECH_options_str  += '<option value="CHEMICAL_ADDITION: ALUM">CHEMICAL_ADDITION: ALUM</option>';
+            ADD_ON_TECH_options_str  += '<option value="CHEMICAL_ADDITION: FERRIC_CHLORIDE">CHEMICAL_ADDITION: FERRIC_CHLORIDE</option>';
+            ADD_ON_TECH_options_str  += '<option value="INTERMITTENT_SAND_FILTER">INTERMITTENT_SAND_FILTER</option>';
+            ADD_ON_TECH_options_str  += '<option value="MICROSTRAINERS">MICROSTRAINERS</option>';
+            ADD_ON_TECH_options_str  += '<option value="MIXED_MEDIA_FILTER">MIXED_MEDIA_FILTER</option>';
+            ADD_ON_TECH_options_str  += '<option value="NA">NA</option>';
+            ADD_ON_TECH_options_str  += '<option value="RAPID_SAND_FILTER">RAPID_SAND_FILTER</option>';
+            ADD_ON_TECH_options_str  += '<option value="SLOW_SAND_FILTER">SLOW_SAND_FILTER</option>';
+            sel_ADD_ON_TECH.innerHTML = ADD_ON_TECH_options_str;
+            div_ADD_ON_TECH.appendChild(sel_ADD_ON_TECH);
+            var lab_ADD_ON_TECH = document.createElement('div');
+            lab_ADD_ON_TECH.innerHTML = 'ADD_ON_TECH';
+            lab_ADD_ON_TECH.className = 'filterlabel';
+            div_ADD_ON_TECH.appendChild(lab_ADD_ON_TECH);
+            var reset_ADD_ON_TECH = document.createElement('div');
+            reset_ADD_ON_TECH.innerHTML = 'clear filter';
+            reset_ADD_ON_TECH.className = 'filterlabel';
+            reset_ADD_ON_TECH.onclick = function() {
+                var options = document.getElementById("sel_ADD_ON_TECH").options;
+                for (var i=0; i < options.length; i++) {
+                    options[i].selected = false;
+                }
+                filterFunc();
+            };
+            div_ADD_ON_TECH.appendChild(reset_ADD_ON_TECH);
+        </script>
+    </body>
+</html>
